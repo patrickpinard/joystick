@@ -1,0 +1,98 @@
+<html>
+	<head>
+		<style>
+
+			body
+			{
+				margin: 0px;
+				padding: 0px;
+				font-family: monospace;
+			}
+			.row
+			{
+				display: inline-flex;
+				clear: both;
+			}
+			.columnLateralsx
+			{
+			float: left;
+			width: 15%;
+			min-width: 400px;
+			}
+			.columnLateraldx
+			{
+			float: right;
+			width: 15%;
+			min-width: 400px;
+			}
+
+		</style>
+		<!-- import joystick library and ajax-->
+		<script src="static/joy.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+	</head>
+
+	<body>
+		
+
+		<!-- create a row with the two joysticks-->
+		<div class="row">
+			<div class="columnLateralsx">
+				<div id="speed" style="width:300px;height:300px;margin:100px"></div>
+			</div>
+
+			<div class="columnLateraldx">
+				<div id="steering" style="width:300px;height:300px;margin:100px"></div>
+			</div>			
+		</div>
+
+	
+		<script type="text/javascript">
+
+// POSTer function uses ajax library to post data from joystick to the server
+
+function POSTer(toLolcalHosta, toLolcalHostb,toLolcalHostc, toLolcalHostd) {
+	formDATI = {
+            "motorX": toLolcalHosta,
+			"motorY": toLolcalHostb,
+			"servoX" : toLolcalHostc,
+			"servoY" : toLolcalHostd
+		};
+	
+	//	Transform data into JSON to be sent	
+    var formData = JSON.stringify(formDATI);
+
+	//	Ajax Request
+    $.ajax({
+    type: "POST",							// Post method sends data whithoud showing in url
+    url: window.location.href + "post",		// Link is taken from the location url added by "post" (flask POST route)
+    data: formData,							// Data is JSON dataset
+    success: function(){},
+    dataType: "json",
+	contentType : "application/json",
+	secure: true, 
+	headers: {								// Header is made for CORS policy
+		'Access-Control-Allow-Origin' : '*',
+	}
+
+  	});
+}
+
+
+// Create Joystick objects
+var Joy1 = new JoyStick('speed');
+var Joy2 = new JoyStick('steering');
+
+//Call POSTer function every 50ms, sending data acquired by the two joysticks 
+setInterval(function(){ 
+	joy1Xvar = Joy1.GetX();
+	joy1Yvar = Joy1.GetX();
+	joy2Xvar = Joy2.GetX();
+	joy2Yvar = Joy2.GetY(); 
+	POSTer(parseInt(joy2Xvar), parseInt(joy2Yvar), parseInt(joy1Xvar), parseInt(joy1Yvar)) 
+	}, 50);
+
+		</script>
+	</body>
+</html>
